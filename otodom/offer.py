@@ -16,7 +16,8 @@ def get_offer_phone_numbers(offer_id, cookie, csrf_token):
     """
     This method makes a request to the OtoDom API asking for the poster's phone number(s) and returns it.
 
-    :param offer_id: string, taken from context, see the return section of :meth:`scrape.category.get_category` for reference
+    :param offer_id: string, taken from context, see the return section of :meth:`scrape.category.get_category` for
+    reference
     :param cookie: string, see :meth:`scrape.utils.get_cookie_from` for reference
     :param csrf_token: string, see :meth:`scrape.utils.get_csrf_token` for reference
     :rtype: list(string)

@@ -19,7 +19,8 @@ def replace_all(text, dic):
     This method returns the input string, but replaces its characters according to the input dictionary.
 
     :param text: input string
-    :param dic: dictionary containing the changes. key is the character that's supposed to be changed and value is the desired value
+    :param dic: dictionary containing the changes. key is the character that's supposed to be changed and value is
+    the desired value
     :rtype: string
     :return: String with the according characters replaced
     """
@@ -41,9 +42,11 @@ def normalize_text(text):
 
 def get_region_from_autosuggest(region_part):
     """
-    This method makes a request to the OtoDom api, asking for the best fitting region for the supplied region_part string.
+    This method makes a request to the OtoDom api, asking for the best fitting region for the supplied
+    region_part string.
 
-    :param region_part: input string, it should be a part of an existing region in Poland, either city, street, district or voivodeship
+    :param region_part: input string, it should be a part of an existing region in Poland, either city, street,
+    district or voivodeship
     :rtype: dict
     :return: A dictionary which contents depend on the API response.
     """
@@ -72,7 +75,8 @@ def get_region_from_autosuggest(region_part):
 
 def get_region_from_filters(filters):
     """
-    This method does a similiar thing as :meth:`scrape.utils.get_region_from_autosuggest` but instead of calling the API, it uses the data provided in the filters
+    This method does a similiar thing as :meth:`scrape.utils.get_region_from_autosuggest` but instead of calling the
+    API, it uses the data provided in the filters
 
     :param filters: dict, see :meth:`scrape.category.get_category` for reference
     :rtype: dict
