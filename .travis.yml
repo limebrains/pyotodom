@@ -1,0 +1,26 @@
+sudo: required
+addons:
+  apt:
+    packages:
+    - python3.6
+    - python3.5
+    - python3.5-dev
+    sources:
+    - deadsnakes
+after_success:
+- coveralls
+env:
+- TOXENV=check-isort
+- TOXENV=check-flake8
+- TOXENV=py36
+- TOXENV=py35
+- TOXENV=py34
+- TOXENV=py33
+- TOXENV=py27
+- TOXENV=pypy
+install:
+- pip install -U tox
+- pip install coveralls
+language: python
+script:
+- tox

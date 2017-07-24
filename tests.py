@@ -51,13 +51,13 @@ def test_get_region_from_autosuggest(region_part, expected_value):
 @pytest.mark.parametrize("get_region_from_autosuggest_value", ACTUAL_REGIONS)
 @pytest.mark.parametrize("region", REGIONS_TO_TEST)
 def test_get_url(main_category, detail_category, region, get_region_from_autosuggest_value):
-        with mock.patch("scrape.utils.get_region_from_autosuggest") as get_region_from_autosuggest:
+        with mock.patch("otodom.utils.get_region_from_autosuggest") as get_region_from_autosuggest:
             get_region_from_autosuggest.return_value = get_region_from_autosuggest_value
             assert utils.get_url(main_category, detail_category, region)
 
 
 def test_get_response_for_url():
-    with mock.patch("scrape.utils.requests.get") as get:
+    with mock.patch("otodom.utils.requests.get") as get:
         utils.get_response_for_url("")
         assert get.called
 
@@ -106,11 +106,11 @@ def test_was_category_search_successful(markup_path, expected_value):
 
 
 def test_get_category():
-    with mock.patch("scrape.category.get_url") as get_url,\
-            mock.patch("scrape.category.get_response_for_url") as get_response_for_url,\
-            mock.patch("scrape.category.was_category_search_successful") as was_category_search_successful,\
-            mock.patch("scrape.category.parse_category_content") as parse_category_content,\
-            mock.patch("scrape.category.get_category_number_of_pages", return_value=1) as get_category_number_of_pages:
+    with mock.patch("otodom.category.get_url") as get_url,\
+            mock.patch("otodom.category.get_response_for_url") as get_response_for_url,\
+            mock.patch("otodom.category.was_category_search_successful") as was_category_search_successful,\
+            mock.patch("otodom.category.parse_category_content") as parse_category_content,\
+            mock.patch("otodom.category.get_category_number_of_pages", return_value=1) as get_category_number_of_pages:
         category.get_category("", "", "")
         assert get_url.called
         assert get_response_for_url.called
@@ -283,8 +283,8 @@ def test_get_offer_description(markup_path, expected_value):
 
 
 def test_get_offer_phone_numbers():
-    with mock.patch("scrape.offer.requests.request") as request,\
-            mock.patch("scrape.offer.json.loads") as json_loads:
+    with mock.patch("otodom.offer.requests.request") as request,\
+            mock.patch("otodom.offer.json.loads") as json_loads:
         assert offer.get_offer_phone_numbers("", "", "")
         assert request.called
         assert json_loads.called
@@ -341,15 +341,15 @@ def test_get_offer_ninja_pv(markup_path, expected_value):
     )
 ])
 def test_get_offer_information(url, context):
-        with mock.patch("scrape.offer.get_response_for_url") as get_response_for_url,\
-                mock.patch("scrape.offer.BeautifulSoup") as BeautifulSoup,\
-                mock.patch("scrape.offer.get_cookie_from") as get_cookie_from, \
-                mock.patch("scrape.offer.get_csrf_token") as get_csrf_token, \
-                mock.patch("scrape.offer.get_offer_phone_numbers") as get_offer_phone_numbers, \
-                mock.patch("scrape.utils.replace_all") as replace_all, \
-                mock.patch("scrape.offer.get_offer_ninja_pv") as get_offer_ninja_pv, \
-                mock.patch("scrape.offer.get_offer_total_floors"), \
-                mock.patch("scrape.offer.get_offer_apartment_details"):
+        with mock.patch("otodom.offer.get_response_for_url") as get_response_for_url,\
+                mock.patch("otodom.offer.BeautifulSoup") as BeautifulSoup,\
+                mock.patch("otodom.offer.get_cookie_from") as get_cookie_from, \
+                mock.patch("otodom.offer.get_csrf_token") as get_csrf_token, \
+                mock.patch("otodom.offer.get_offer_phone_numbers") as get_offer_phone_numbers, \
+                mock.patch("otodom.utils.replace_all") as replace_all, \
+                mock.patch("otodom.offer.get_offer_ninja_pv") as get_offer_ninja_pv, \
+                mock.patch("otodom.offer.get_offer_total_floors"), \
+                mock.patch("otodom.offer.get_offer_apartment_details"):
             assert offer.get_offer_information(url, context)
             assert get_response_for_url.called
             assert BeautifulSoup.called
