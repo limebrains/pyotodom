@@ -1,15 +1,12 @@
-# python modules
 import json
 import logging
 import re
 import unicodedata
 from urllib.parse import quote
 
-# third party
 import requests
 from scrapper_helpers.utils import caching
 
-# own modules
 from otodom import BASE_URL
 
 REGION_DATA_KEYS = ["city", "voivodeship", "[district_id]", "[street_id]"]

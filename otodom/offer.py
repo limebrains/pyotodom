@@ -1,16 +1,12 @@
-# python modules
 import json
-import re
 import logging
+import re
 
-# third party
 import requests
 from bs4 import BeautifulSoup
 from scrapper_helpers.utils import caching
 
-# own modules
-from otodom.utils import get_response_for_url, get_csrf_token, get_cookie_from, replace_all
-
+from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url, replace_all
 
 log = logging.getLogger(__file__)
 

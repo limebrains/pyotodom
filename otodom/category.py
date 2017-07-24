@@ -1,11 +1,8 @@
-# python modules
+import logging
 from urllib.parse import urlparse
 
-# third party
-import logging
 from bs4 import BeautifulSoup
 
-# own modules
 from otodom import WHITELISTED_DOMAINS
 from otodom.utils import get_response_for_url, get_url
 
