@@ -3,13 +3,18 @@ import pickle
 from bs4 import BeautifulSoup
 from unittest import mock
 
-import scrape.category as category
-import scrape.offer as offer
-import scrape.utils as utils
+import otodom.category as category
+import otodom.offer as offer
+import otodom.utils as utils
 
-REGIONS_TO_TEST = ["Gdań", "Sop", "Oliw", "Wrzeszcz", "czechowice", "Nowa Wieś", "pomorskie", "Książąt pomor sopot", ""]
-ACTUAL_REGIONS = [{"city": "gdansk_40"}, {"city": "sopot_208"}, {"[district_id]": 51316, "city": "gdansk_40"}, {"[district_id]": 30,
-                  "city": "gdansk_40"}, {"city": "czechowice-dziedzice_2258"}, {"city": "nowa-wies_6001"}, {"voivodeship": "pomorskie"}, {"[street_id]": 15544, "city": "sopot_208"}, {}]
+REGIONS_TO_TEST = [
+    "Gdań", "Sop", "Oliw", "Wrzeszcz", "czechowice", "Nowa Wieś", "pomorskie", "Książąt pomor sopot", ""
+]
+ACTUAL_REGIONS = [
+    {"city": "gdansk_40"}, {"city": "sopot_208"}, {"[district_id]": 51316, "city": "gdansk_40"},
+    {"[district_id]": 30,"city": "gdansk_40"}, {"city": "czechowice-dziedzice_2258"}, {"city": "nowa-wies_6001"},
+    {"voivodeship": "pomorskie"}, {"[street_id]": 15544, "city": "sopot_208"}, {}
+]
 
 
 @pytest.mark.parametrize(
@@ -41,7 +46,8 @@ def test_get_region_from_autosuggest(region_part, expected_value):
 
 
 @pytest.mark.parametrize("main_category", ["wynajem", "sprzedaz"])
-@pytest.mark.parametrize("detail_category", ["mieszkanie", "dom", "pokoj", "dzialka", "lokal", "haleimagazyny", "garaz", ""])
+@pytest.mark.parametrize("detail_category", [
+    "mieszkanie", "dom", "pokoj", "dzialka", "lokal", "haleimagazyny", "garaz", ""])
 @pytest.mark.parametrize("get_region_from_autosuggest_value", ACTUAL_REGIONS)
 @pytest.mark.parametrize("region", REGIONS_TO_TEST)
 def test_get_url(main_category, detail_category, region, get_region_from_autosuggest_value):
@@ -113,12 +119,19 @@ def test_get_category():
         assert get_category_number_of_pages.called
 
 
-
-@pytest.mark.parametrize('markup_path,expected_value',
-                         [("test_data/offer", 'Zobacz to 3 pokojowe mieszkanie na wynajem w miejscowości Gdańsk, Oliwa,  Aleksandra Majkowskiego, za cenę 379 zł/miesiąc. To mieszkanie na wynajem  na parter piętrze ma 92 m² powierzchni użytkowej i 92 m² powierzchni całkowitej. Właściciel jako najważniejsze zalety mieszkania wymienia: piwnica, oddzielna kuchnia, telewizja kablowa. Otodom 48721860')])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    (
+        "test_data/offer",
+        'Zobacz to 3 pokojowe mieszkanie na wynajem w miejscowości Gdańsk, Oliwa,  Aleksandra Majkowskiego, '
+        'za cenę 379 zł/miesiąc. To mieszkanie na wynajem  na parter piętrze ma 92 m² powierzchni użytkowej i '
+        '92 m² powierzchni całkowitej. Właściciel jako najważniejsze zalety mieszkania wymienia: piwnica, '
+        'oddzielna kuchnia, telewizja kablowa. Otodom 48721860'
+    )
+])
 def test_get_offer_facebook_description(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
-        assert offer.get_offer_facebook_description(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
+        loaded_data = BeautifulSoup(pickle.load(markup_file), "html.parser")
+        assert offer.get_offer_facebook_description(loaded_data) == expected_value
 
 
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", '0')])
@@ -142,22 +155,34 @@ def test_get_offer_poster_name(markup_path, expected_value):
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", '')])
 def test_get_offer_3d_walkaround_link(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
-        assert offer.get_offer_3d_walkaround_link(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
+        assert offer.get_offer_3d_walkaround_link(
+            BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", 'Gdańsk Apartament OlivaSeaside mieszkanie na doby')])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    ("test_data/offer", 'Gdańsk Apartament OlivaSeaside mieszkanie na doby')
+])
 def test_get_offer_title(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_title(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", 'Gdańsk, Oliwa,  Aleksandra Majkowskiego')])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    ("test_data/offer", 'Gdańsk, Oliwa,  Aleksandra Majkowskiego')
+])
 def test_get_offer_address(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_address(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", [{'Nr oferty w Otodom': '48721860'}, {'Liczba wyświetleń strony': '1143'}, {'Data dodania': 'ponad 14 dni temu'}, {'Data aktualizacji': 'ponad 14 dni temu'}])])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    ("test_data/offer", [
+        {'Nr oferty w Otodom': '48721860'},
+        {'Liczba wyświetleń strony': '1143'},
+        {'Data dodania': 'ponad 14 dni temu'},
+        {'Data aktualizacji': 'ponad 14 dni temu'}
+    ])
+])
 def test_get_offer_details(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_details(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
@@ -166,7 +191,8 @@ def test_get_offer_details(markup_path, expected_value):
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", ('54.4092043', '18.570687700000008'))])
 def test_get_offer_geographical_coordinates(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
-        assert offer.get_offer_geographical_coordinates(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
+        assert offer.get_offer_geographical_coordinates(
+            BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", "")])
@@ -175,23 +201,82 @@ def test_get_offer_video_link(markup_path, expected_value):
         assert offer.get_offer_video_link(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", ['https://img41.otodom.pl/images_otodompl/16961046_6_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-.jpg', 'https://img40.otodom.pl/images_otodompl/16961046_4_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-wynajem.jpg', 'https://img42.otodom.pl/images_otodompl/16961046_5_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-pomorskie.jpg', 'https://img40.otodom.pl/images_otodompl/16961046_8_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-.jpg', 'https://img40.otodom.pl/images_otodompl/16961046_7_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-.jpg', 'https://img41.otodom.pl/images_otodompl/16961046_9_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-.jpg', 'https://img41.otodom.pl/images_otodompl/16961046_1_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-gdansk.jpg', 'https://img41.otodom.pl/images_otodompl/16961046_3_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-mieszkania.jpg', 'https://img42.otodom.pl/images_otodompl/16961046_2_1280x1024_gdansk-apartament-olivaseaside-mieszkanie-na-doby-dodaj-zdjecia.jpg'])])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    ("test_data/offer", [
+        'https://img41.otodom.pl/images_otodompl/16961046_6_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-.jpg',
+        'https://img40.otodom.pl/images_otodompl/16961046_4_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-wynajem.jpg',
+        'https://img42.otodom.pl/images_otodompl/16961046_5_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-pomorskie.jpg',
+        'https://img40.otodom.pl/images_otodompl/16961046_8_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-.jpg',
+        'https://img40.otodom.pl/images_otodompl/16961046_7_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-.jpg',
+        'https://img41.otodom.pl/images_otodompl/16961046_9_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-.jpg',
+        'https://img41.otodom.pl/images_otodompl/16961046_1_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-gdansk.jpg',
+        'https://img41.otodom.pl/images_otodompl/16961046_3_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-mieszkania.jpg',
+        'https://img42.otodom.pl/images_otodompl/16961046_2_1280x1024_gdansk-apartament-'
+        'olivaseaside-mieszkanie-na-doby-dodaj-zdjecia.jpg'
+    ])
+])
 def test_get_offer_photos_links(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_photos_links(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", ['zmywarka', 'lodówka', 'meble', 'kuchenka', 'telewizor', 'pralka', 'domofon / wideofon', 'telewizja kablowa', 'internet', 'piwnica', 'oddzielna kuchnia'])])
+
+@pytest.mark.parametrize('markup_path,expected_value', [
+    ("test_data/offer", [
+        'zmywarka', 'lodówka', 'meble', 'kuchenka', 'telewizor', 'pralka', 'domofon / wideofon',
+        'telewizja kablowa', 'internet', 'piwnica', 'oddzielna kuchnia'
+    ])
+])
 def test_get_offer_additional_assets(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
-        assert offer.get_offer_additional_assets(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
+        assert offer.get_offer_additional_assets(
+            BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", [{'kaucja': '800 zł'}, {'rodzaj zabudowy': 'kamienica'}])])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    ("test_data/offer", [{'kaucja': '800 zł'}, {'rodzaj zabudowy': 'kamienica'}])
+])
 def test_get_offer_apartment_details(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
-        assert offer.get_offer_apartment_details(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
+        assert offer.get_offer_apartment_details(
+            BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", ' Apartament 3-pokojowy z oddzielną kuchnią dla maksymalnie 8 osób, wynajem na doby od 28.06.2017!! Cena za dobę wynosi: a) 4 osoby- 379 PLN/ doba b) 5 osób- 439 PLN/ doba c) 6 osób- 499 PLN/ doba d) 7 osób - 549 PLN/ doba e) 8 osób- 599 PLN/ doba  Minimalna długość pobytu to 3 dni.  Przy rezerwacji pobytu powyżej 7 dni oferujemy 10% zniżki na cały pobyt!!! Całe mieszkanie przy wynajmie jest do Państwa dyspozycji to również całkowita niezależność oraz prywatność.  Apartament Oliva Seaside położony jest w Gdańsku Oliwie, najpiękniejszej i pełnej zieleni części Gdańska, w pobliżu sławnej Katedry Oliwskiej, Parku Botanicznego, Ogrodu Oliwskiego z Pałacem, Największego ZOO w Polsce i rozległego leśnego Trójmiejskiego Parku Krajobrazowego ze wzgórzami, dolinami, strumieniami i pomnikami przyrody.  Mieszkanie znajduje się w odległości 9km do Starówki Gdańskiej (około 12 minut drogi Szybką Koleją Miejską SKM), pod samą granicą z Sopotem. Jednocześnie jest stąd łatwe i szybkie połączenie do Gdyni i Centrum Gdańska (jesteśmy praktycznie w samym środku Trójmiasta i w odległości 100m znajduje się pętla tramwajowa oraz postój taksówek)a także 10 min drogi autem od jednej z najpiękniejszych plaż w Trójmieście- Jelitkowa. W pobliżu restauracje, biblioteka, centrum handlowe, MC Donald itd.  Apartament jest duży i przestronny, jest świeżo po remoncie, urządzony w nowoczesnej skandynawskiej stylistyce i w wyższym standardzie. . Składa się z 3 pokoi (3-osobowy, 2-osobowy oraz 3-osobowy), 2 łazienek oraz dużej przestronnej kuchni z dwiema lodówkami. Jest idealny na pobyt czterech dorosłych osób z małymi dziećmi. W każdym pokoju znajduje się telewizor LCD z dostępem do kanałów kablowych,biurko do pracy, pojemne szafy zamykane na kluczyk, pond to w lokalu 2 łazienki z kabiną prysznicową, jak również pościel oraz ręczniki. Goście mogą korzystać z bezpłatnego WiFi. W mieszkaniu znajduje się całe niezbędne wyposażenie kuchenne (lodówki, zmywarka, czajnik, sztućce, garnki, mikrofala) oraz dwie pralki i pościel Na Państwa życzenie, dla małego dziecka i po wcześniejszych ustaleniach możemy zaoferować łóżeczko turystyczne.   Polecamy na dłuższy pobyt wakacyjny!  24.08-27.08 ZAREZERWOWANE  ')])
+
+@pytest.mark.parametrize('markup_path,expected_value', [
+    (
+        "test_data/offer",
+        ' Apartament 3-pokojowy z oddzielną kuchnią dla maksymalnie 8 osób, wynajem na doby od 28.06.2017!! '
+        'Cena za dobę wynosi: a) 4 osoby- 379 PLN/ doba b) 5 osób- 439 PLN/ doba c) 6 osób- 499 PLN/ doba d) '
+        '7 osób - 549 PLN/ doba e) 8 osób- 599 PLN/ doba  Minimalna długość pobytu to 3 dni.  Przy rezerwacji '
+        'pobytu powyżej 7 dni oferujemy 10% zniżki na cały pobyt!!! Całe mieszkanie przy wynajmie jest do Państwa '
+        'dyspozycji to również całkowita niezależność oraz prywatność.  Apartament Oliva Seaside położony jest w '
+        'Gdańsku Oliwie, najpiękniejszej i pełnej zieleni części Gdańska, w pobliżu sławnej Katedry Oliwskiej, '
+        'Parku Botanicznego, Ogrodu Oliwskiego z Pałacem, Największego ZOO w Polsce i rozległego leśnego '
+        'Trójmiejskiego Parku Krajobrazowego ze wzgórzami, dolinami, strumieniami i pomnikami przyrody.  '
+        'Mieszkanie znajduje się w odległości 9km do Starówki Gdańskiej (około 12 minut drogi '
+        'Szybką Koleją Miejską SKM), pod samą granicą z Sopotem. Jednocześnie jest stąd łatwe i '
+        'szybkie połączenie do Gdyni i Centrum Gdańska (jesteśmy praktycznie w samym środku Trójmiasta '
+        'i w odległości 100m znajduje się pętla tramwajowa oraz postój taksówek)a także 10 min drogi autem '
+        'od jednej z najpiękniejszych plaż w Trójmieście- Jelitkowa. W pobliżu restauracje, biblioteka, '
+        'centrum handlowe, MC Donald itd.  Apartament jest duży i przestronny, jest świeżo po remoncie, '
+        'urządzony w nowoczesnej skandynawskiej stylistyce i w wyższym standardzie. . Składa się z '
+        '3 pokoi (3-osobowy, 2-osobowy oraz 3-osobowy), 2 łazienek oraz dużej przestronnej kuchni z '
+        'dwiema lodówkami. Jest idealny na pobyt czterech dorosłych osób z małymi dziećmi. W każdym '
+        'pokoju znajduje się telewizor LCD z dostępem do kanałów kablowych,biurko do pracy, pojemne '
+        'szafy zamykane na kluczyk, pond to w lokalu 2 łazienki z kabiną prysznicową, jak również pościel '
+        'oraz ręczniki. Goście mogą korzystać z bezpłatnego WiFi. W mieszkaniu znajduje się całe niezbędne '
+        'wyposażenie kuchenne (lodówki, zmywarka, czajnik, sztućce, garnki, mikrofala) oraz dwie pralki i pościel '
+        'Na Państwa życzenie, dla małego dziecka i po wcześniejszych ustaleniach możemy zaoferować łóżeczko '
+        'turystyczne.   Polecamy na dłuższy pobyt wakacyjny!  24.08-27.08 ZAREZERWOWANE  '
+    )
+])
 def test_get_offer_description(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_description(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
@@ -205,13 +290,56 @@ def test_get_offer_phone_numbers():
         assert json_loads.called
 
 
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", {"language":"pl_PL","platform":"desktop","trackPage":"ad_page","event_type":"pv","action_type":"ad_page","user_status":"unlogged","category":102,"cat_l1_id":102,"cat_l1_name":"Flat","business":"rent","ad_id":48721860,"ad_impressions":[48703160],"ad_position":[1],"ad_photo":9,"poster_type":"private","seller_id":"769139","ad_price":379,"price_currency":"PLN","region_id":"11","region_name":"pomorskie","city_id":"40","city_name":"Gdańsk","district_id":"16","district_name":"Oliwa","surface":"92","rooms":"3","ad_packages":"paid_for_post_30"})])
+@pytest.mark.parametrize('markup_path,expected_value', [
+    (
+        "test_data/offer",
+        {
+            "language": "pl_PL",
+            "platform": "desktop",
+            "trackPage": "ad_page",
+            "event_type": "pv",
+            "action_type": "ad_page",
+            "user_status": "unlogged",
+            "category": 102,
+            "cat_l1_id": 102,
+            "cat_l1_name": "Flat",
+            "business": "rent",
+            "ad_id": 48721860,
+            "ad_impressions": [48703160],
+            "ad_position": [1],
+            "ad_photo": 9,
+            "poster_type": "private",
+            "seller_id": "769139",
+            "ad_price":379,
+            "price_currency": "PLN",
+            "region_id": "11",
+            "region_name": "pomorskie",
+            "city_id": "40",
+            "city_name": "Gdańsk",
+            "district_id": "16",
+            "district_name": "Oliwa",
+            "surface": "92",
+            "rooms": "3",
+            "ad_packages": "paid_for_post_30"
+        }
+    )
+])
 def test_get_offer_ninja_pv(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_ninja_pv(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
-@pytest.mark.parametrize("url,context", [("https://www.otodom.pl/oferta/gdansk-apartament-olivaseaside-mieszkanie-na-doby-ID3iqMs.html", {'detail_url': 'https://www.otodom.pl/oferta/gdansk-apartament-olivaseaside-mieszkanie-na-doby-ID3iqMs.html#a7099545ba', 'offer_id': '3iqMs', 'poster': 'Oferta prywatna'})])
+@pytest.mark.parametrize("url,context", [
+    (
+        "https://www.otodom.pl/oferta/gdansk-apartament-olivaseaside-mieszkanie-na-doby-ID3iqMs.html",
+        {
+            'detail_url': 'https://www.otodom.pl/oferta/'
+                          'gdansk-apartament-olivaseaside-mieszkanie-na-doby-ID3iqMs.html#a7099545ba',
+            'offer_id': '3iqMs',
+            'poster': 'Oferta prywatna'
+        }
+    )
+])
 def test_get_offer_information(url, context):
         with mock.patch("scrape.offer.get_response_for_url") as get_response_for_url,\
                 mock.patch("scrape.offer.BeautifulSoup") as BeautifulSoup,\

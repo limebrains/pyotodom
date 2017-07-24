@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from scrapper_helpers.utils import caching
 
 # own modules
-from scrape.utils import get_response_for_url, get_csrf_token, get_cookie_from, replace_all
+from otodom.utils import get_response_for_url, get_csrf_token, get_cookie_from, replace_all
 
 
 log = logging.getLogger(__file__)

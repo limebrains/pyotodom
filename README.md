@@ -16,7 +16,7 @@ py.test tests.py -vv
 
 ### Example script
 ```
-python otodom.py
+python example.py
 ```
 
 

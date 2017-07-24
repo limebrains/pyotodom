@@ -6,8 +6,8 @@ import logging
 from bs4 import BeautifulSoup
 
 # own modules
-import otodom
-from scrape.utils import get_response_for_url, get_url
+from otodom import WHITELISTED_DOMAINS
+from otodom.utils import get_response_for_url, get_url
 
 log = logging.getLogger(__file__)
 
@@ -27,7 +27,7 @@ def parse_category_offer(offer_markup):
     if not url:
         # detail url is not present
         return {}
-    if urlparse(url).hostname not in otodom.WHITELISTED_DOMAINS:
+    if urlparse(url).hostname not in WHITELISTED_DOMAINS:
         # domain is not supported by this backend
         return {}
     poster = html_parser.find(class_="offer-item-details-bottom").find(class_="pull-right")

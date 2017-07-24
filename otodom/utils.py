@@ -10,11 +10,12 @@ import requests
 from scrapper_helpers.utils import caching
 
 # own modules
-import otodom
+from otodom import BASE_URL
 
+REGION_DATA_KEYS = ["city", "voivodeship", "[district_id]", "[street_id]"]
 
 log = logging.getLogger(__file__)
-REGION_DATA_KEYS = ["city", "voivodeship", "[district_id]", "[street_id]"]
+
 
 def replace_all(text, dic):
     """
@@ -80,7 +81,11 @@ def get_region_from_filters(filters):
     :rtype: dict
     :return: A dictionary which contents depend on the filters content.
     """
-    region_dict = ({region_data: filters.get(region_data) for region_data in REGION_DATA_KEYS if region_data in filters})
+    region_dict = {
+        region_data: filters.get(region_data)
+        for region_data in REGION_DATA_KEYS
+        if region_data in filters
+    }
     return region_dict
 
 
@@ -115,7 +120,7 @@ def get_url(main_category, detail_category, region, ads_per_page="", page=None, 
         filters["[street_id]"] = region_data["[street_id]"]
 
     # creating base url
-    url = "/".join([otodom.BASE_URL, main_category, detail_category, city_or_voivodeship])
+    url = "/".join([BASE_URL, main_category, detail_category, city_or_voivodeship])
 
     # adding building type if exists in filters
     if "building_type" in filters:
