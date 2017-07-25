@@ -1,13 +1,24 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import json
 import logging
 import re
+import sys
 import unicodedata
-from urllib.parse import quote
-
 import requests
+try:
+    from __builtin__ import unicode
+except ImportError:
+    unicode = lambda x, *args: x
 from scrapper_helpers.utils import caching
 
 from otodom import BASE_URL
+
+if sys.version_info < (3, 2):
+    from urllib import quote
+else:
+    from urllib.parse import quote
 
 REGION_DATA_KEYS = ["city", "voivodeship", "[district_id]", "[street_id]"]
 
@@ -29,7 +40,7 @@ def replace_all(text, dic):
     return text
 
 
-def normalize_text(text):
+def normalize_text(text, lower=True, replace_spaces='-'):
     """
     This method returns the input string, but normalizes is it for use in the url.
 
@@ -37,7 +48,18 @@ def normalize_text(text):
     :rtype: string
     :return: Normalized string. lowercase, no diacritics, '-' instead of ' '
     """
-    return unicodedata.normalize('NFKD', text.lower()).encode('ascii', 'ignore').decode("utf-8").replace(" ", "-")
+    try:
+        unicoded = unicode(text, 'utf8')
+    except TypeError:
+        unicoded = text
+    if lower:
+        unicoded = unicoded.lower()
+    normalized = unicodedata.normalize('NFKD', unicoded)
+    encoded_ascii = normalized.encode('ascii', 'ignore')
+    decoded_utf8 = encoded_ascii.decode("utf-8")
+    if replace_spaces:
+        decoded_utf8 = decoded_utf8.replace(" ", replace_spaces)
+    return decoded_utf8
 
 
 def get_region_from_autosuggest(region_part):
@@ -52,7 +74,8 @@ def get_region_from_autosuggest(region_part):
     """
     if not region_part:
         return {}
-    url = "https://www.otodom.pl/ajax/geo6/autosuggest/?data={0}".format(region_part)
+    url = u"https://www.otodom.pl/ajax/geo6/autosuggest/?data={0}".format(
+        normalize_text(region_part, lower=False, replace_spaces=''))
     response = json.loads(get_response_for_url(url).text)[0]
     region_type = response["level"]
     text = response["text"].replace("<strong>", "").replace("</strong>", "").split(", ")
@@ -60,14 +83,14 @@ def get_region_from_autosuggest(region_part):
     region_dict = {}
 
     if region_type == "CITY":
-        region_dict["city"] = "{0}{1}{2}".format(normalize_text(text[0]), "_", response["city_id"])
+        region_dict["city"] = u"{0}{1}{2}".format(normalize_text(text[0]), "_", response["city_id"])
     elif region_type == "DISTRICT":
-        region_dict["city"] = "{0}{1}{2}".format(normalize_text(text[1]), "_", response["city_id"])
+        region_dict["city"] = u"{0}{1}{2}".format(normalize_text(text[1]), "_", response["city_id"])
         region_dict["[district_id]"] = response["district_id"]
     elif region_type == "REGION":
         region_dict["voivodeship"] = normalize_text(text[0])
     elif region_type == "STREET":
-        region_dict["city"] = "{0}{1}{2}".format(normalize_text(text[0]), "_", response["city_id"])
+        region_dict["city"] = u"{0}{1}{2}".format(normalize_text(text[0]), "_", response["city_id"])
         region_dict["[street_id]"] = response["street_id"]
 
     return region_dict
@@ -139,8 +162,8 @@ def get_url(main_category, detail_category, region, ads_per_page="", page=None, 
                 filter_list.append("search{}={}".format(quote(key), item))
         else:
             filter_list.append("search{}={}".format(quote(key), value))
-
-    url = url + "&".join([ads_per_page, page, *filter_list])
+    print(filter_list)
+    url = url + "&".join([ads_per_page, page] + filter_list)
     log.info(url)
     return url
 

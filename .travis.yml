@@ -5,6 +5,7 @@ addons:
     - python3.6
     - python3.5
     - python3.5-dev
+    - python3.3
     sources:
     - deadsnakes
 after_success:
@@ -14,6 +15,9 @@ env:
 - TOXENV=check-flake8
 - TOXENV=py36
 - TOXENV=py35
+- TOXENV=py34
+- TOXENV=py33
+- TOXENV=py27
 install:
 - pip install -U tox
 - pip install coveralls

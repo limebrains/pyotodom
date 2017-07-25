@@ -1,3 +1,4 @@
+mock
 requests
 beautifulsoup4
 https://github.com/limebrains/scrapper-helpers/archive/master.zip

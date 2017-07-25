@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os
 import logging
 
@@ -9,7 +12,7 @@ log = logging.getLogger(__file__)
 SCRAPE_LIMIT = os.environ.get('SCRAPE_LIMIT', None)
 
 if __name__ == '__main__':
-    input_dict = {}
+    input_dict = {'[filter_float_price:from]': 0, '[created_since]': 1}
 
     if os.getenv('PRICE_TO'):
         input_dict['[filter_float_price:to]'] = os.getenv('PRICE_TO')

@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='pyotodom',
-    version='0.0.1',
+    version='0.0.2',
     description="pyotodom - python wrapper for otodom",
     author='LimeBrains',
     author_email='mail@limebrains.com',

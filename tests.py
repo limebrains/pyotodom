@@ -1,12 +1,19 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import pytest
 import pickle
+import sys
 from bs4 import BeautifulSoup
-from unittest import mock
 
 import otodom.category as category
 import otodom.offer as offer
 import otodom.utils as utils
 
+if sys.version_info < (3, 3):
+    from mock import mock
+else:
+    from unittest import mock
 REGIONS_TO_TEST = [
     "Gdań", "Sop", "Oliw", "Wrzeszcz", "czechowice", "Nowa Wieś", "pomorskie", "Książąt pomor sopot", ""
 ]
@@ -15,7 +22,6 @@ ACTUAL_REGIONS = [
     {"[district_id]": 30,"city": "gdansk_40"}, {"city": "czechowice-dziedzice_2258"}, {"city": "nowa-wies_6001"},
     {"voivodeship": "pomorskie"}, {"[street_id]": 15544, "city": "sopot_208"}, {}
 ]
-
 
 @pytest.mark.parametrize(
     'text,dic,expected_value', [
@@ -40,9 +46,10 @@ def test_get_region_from_filters(filters, expected_value):
     assert utils.get_region_from_filters(filters) == expected_value
 
 
-@pytest.mark.parametrize('region_part,expected_value', zip(REGIONS_TO_TEST, ACTUAL_REGIONS))
-def test_get_region_from_autosuggest(region_part, expected_value):
-    assert utils.get_region_from_autosuggest(region_part) == expected_value
+def test_get_region_from_autosuggest():
+    with mock.patch("otodom.utils.json.loads") as json_loads:
+        utils.get_region_from_autosuggest("gda")
+        json_loads.called
 
 
 @pytest.mark.parametrize("main_category", ["wynajem", "sprzedaz"])
@@ -62,16 +69,18 @@ def test_get_response_for_url():
         assert get.called
 
 
+@pytest.mark.skipif(sys.version_info <= (3, 1), reason="requires Python3")
 @pytest.mark.parametrize(
     'markup_path,expected_value', [
         ("test_data/markup_no_offers", "95c3ad18f9c716209fdfc5d73b13f4a64fd12fc7ca9b6d0d4a5f60ce80b574b3"),
         ("test_data/markup_offers", "d6e9f6202c0fd68ddc539a54bd728d59aa27d7276470818a57ed7c3c2db5f612")
     ])
 def test_get_csrf_token(markup_path, expected_value):
-    with open(markup_path, "rb") as file:
-        assert utils.get_csrf_token(pickle.load(file)) == expected_value
+    with open(markup_path, "rb") as markup_file:
+        assert utils.get_csrf_token(pickle.load(markup_file)) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize(
     'markup_path,expected_value', [
         ("test_data/markup_offer", {
@@ -85,12 +94,14 @@ def test_parse_category_offer(markup_path, expected_value):
         assert category.parse_category_offer(pickle.load(markup_file)) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/markup_offer", [])])
 def test_parse_category_content(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert category.parse_category_content(pickle.load(markup_file)) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value',
                          [("test_data/markup_offers", 12), ("test_data/markup_no_offers", 1)])
 def test_get_category_number_of_pages(markup_path, expected_value):
@@ -98,6 +109,7 @@ def test_get_category_number_of_pages(markup_path, expected_value):
         assert category.get_category_number_of_pages(pickle.load(markup_file)) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value',
                          [("test_data/markup_offers", True), ("test_data/markup_no_offers", False)])
 def test_was_category_search_successful(markup_path, expected_value):
@@ -119,6 +131,7 @@ def test_get_category():
         assert get_category_number_of_pages.called
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     (
         "test_data/offer",
@@ -134,24 +147,28 @@ def test_get_offer_facebook_description(markup_path, expected_value):
         assert offer.get_offer_facebook_description(loaded_data) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", '0')])
 def test_get_offer_floor(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_floor(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", '')])
 def test_get_offer_total_floors(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_total_floors(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", 'Joanna')])
 def test_get_offer_poster_name(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_poster_name(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", '')])
 def test_get_offer_3d_walkaround_link(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
@@ -159,6 +176,7 @@ def test_get_offer_3d_walkaround_link(markup_path, expected_value):
             BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     ("test_data/offer", 'Gdańsk Apartament OlivaSeaside mieszkanie na doby')
 ])
@@ -167,6 +185,7 @@ def test_get_offer_title(markup_path, expected_value):
         assert offer.get_offer_title(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     ("test_data/offer", 'Gdańsk, Oliwa,  Aleksandra Majkowskiego')
 ])
@@ -175,6 +194,7 @@ def test_get_offer_address(markup_path, expected_value):
         assert offer.get_offer_address(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     ("test_data/offer", [
         {'Nr oferty w Otodom': '48721860'},
@@ -188,6 +208,7 @@ def test_get_offer_details(markup_path, expected_value):
         assert offer.get_offer_details(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", ('54.4092043', '18.570687700000008'))])
 def test_get_offer_geographical_coordinates(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
@@ -195,12 +216,14 @@ def test_get_offer_geographical_coordinates(markup_path, expected_value):
             BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", "")])
 def test_get_offer_video_link(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_video_link(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     ("test_data/offer", [
         'https://img41.otodom.pl/images_otodompl/16961046_6_1280x1024_gdansk-apartament-'
@@ -228,6 +251,7 @@ def test_get_offer_photos_links(markup_path, expected_value):
         assert offer.get_offer_photos_links(BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     ("test_data/offer", [
         'zmywarka', 'lodówka', 'meble', 'kuchenka', 'telewizor', 'pralka', 'domofon / wideofon',
@@ -240,6 +264,7 @@ def test_get_offer_additional_assets(markup_path, expected_value):
             BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     ("test_data/offer", [{'kaucja': '800 zł'}, {'rodzaj zabudowy': 'kamienica'}])
 ])
@@ -249,6 +274,7 @@ def test_get_offer_apartment_details(markup_path, expected_value):
             BeautifulSoup(pickle.load(markup_file), "html.parser")) == expected_value
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     (
         "test_data/offer",
@@ -290,6 +316,7 @@ def test_get_offer_phone_numbers():
         assert json_loads.called
 
 
+@pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
 @pytest.mark.parametrize('markup_path,expected_value', [
     (
         "test_data/offer",

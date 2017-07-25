@@ -9,7 +9,7 @@ Scraping category data
 ======================
 The following method should be used to scrape all the offers compliant with the supplied search parameters
 
-.. autofunction:: scrape.category.get_category
+.. autofunction:: otodom.category.get_category
 
 It can be used like this:
 
@@ -25,7 +25,7 @@ Scraping offer data
 ===================
 The following method should be used to scrape all the information about an offer located under the given string. Context is used for phone number scraping. The corresponding field will be empty if it's not provided.
 
-.. autofunction:: scrape.offer.get_offer_information
+.. autofunction:: otodom.offer.get_offer_information
 
 It can be used like this:
 

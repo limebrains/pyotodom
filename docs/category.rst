@@ -1,5 +1,5 @@
 Category methods
 ================
 
-.. automodule:: scrape.category
+.. automodule:: otodom.category
    :members:

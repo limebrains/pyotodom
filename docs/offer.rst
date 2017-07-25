@@ -1,5 +1,5 @@
 Offer methods
 =============
 
-.. automodule:: scrape.offer
+.. automodule:: otodom.offer
    :members:

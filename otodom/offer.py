@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import json
 import logging
 import re
@@ -313,6 +316,6 @@ def get_offer_information(url, context=None):
         'meta': {
             'cookie': cookie,
             'csrf_token': csrf_token,
-            **context,
+            'context': context
         }
     }

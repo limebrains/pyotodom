@@ -1,5 +1,5 @@
 Utils methods
 =============
 
-.. automodule:: scrape.utils
+.. automodule:: otodom.utils
    :members:
