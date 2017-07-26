@@ -31,7 +31,7 @@ def replace_all(text, dic):
 
     :param text: input string
     :param dic: dictionary containing the changes. key is the character that's supposed to be changed and value is
-    the desired value
+                the desired value
     :rtype: string
     :return: String with the according characters replaced
     """
@@ -68,7 +68,7 @@ def get_region_from_autosuggest(region_part):
     region_part string.
 
     :param region_part: input string, it should be a part of an existing region in Poland, either city, street,
-    district or voivodeship
+                        district or voivodeship
     :rtype: dict
     :return: A dictionary which contents depend on the API response.
     """
@@ -162,7 +162,6 @@ def get_url(main_category, detail_category, region, ads_per_page="", page=None, 
                 filter_list.append("search{}={}".format(quote(key), item))
         else:
             filter_list.append("search{}={}".format(quote(key), value))
-    print(filter_list)
     url = url + "&".join([ads_per_page, page] + filter_list)
     log.info(url)
     return url

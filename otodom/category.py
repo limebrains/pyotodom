@@ -86,9 +86,9 @@ def get_category(main_category, detail_category, region, **filters):
     :param detail_category: "mieszkanie", "dom", "pokoj", "dzialka", "lokal", "haleimagazyny", "garaz", or
     empty string for any
     :param region: a string that contains the region name. Districts, cities and voivodeships are supported. The exact
-        location is established using OtoDom's API, just as it would happen when typing something into the search bar.
-        Empty string returns results for the whole country. Will be ignored if either 'city', 'region'
-        '[district_id]' or '[street_id]' is present in the filters.
+                    location is established using OtoDom's API, just as it would happen when typing something into the
+                    search bar. Empty string returns results for the whole country. Will be ignored if either 'city',
+                    'region', '[district_id]' or '[street_id]' is present in the filters.
     :param filters: the following dict contains every possible filter with examples of its values, but can be empty:
 
     ::
@@ -101,7 +101,7 @@ def get_category(main_category, detail_category, region, **filters):
             '[filter_float_price_per_m:to]': 0  # minimal price per square meter, only used for apartments for sale
             '[filter_enum_market][]': [primary, secondary]  # enum: primary, secondary
             '[filter_enum_building_material][]': []  # enum: brick, wood, breezeblock, hydroton, concrete_plate,
-            concrete, silikat, cellular_concrete, reinforced_concrete, other, only used for apartments for sale
+                concrete, silikat, cellular_concrete, reinforced_concrete, other, only used for apartments for sale
             '[filter_float_m:from]': 0,  # minimal surface
             '[filter_float_m:to]': 0,  # maximal surface
             '[filter_enum_rooms_num][]': '1',  # number of rooms, enum: from "1" to "10", or "more"
@@ -111,16 +111,16 @@ def get_category(main_category, detail_category, region, **filters):
             '[filter_enum_rent_to_students][]': 0,  # whether or not the offer is aimed for students, only used for
              apartments for rent
             '[filter_enum_floor_no][]': 'floor_1',  # enum: cellar, ground_floor, floor_1-floor_10, floor_higher_10,
-            garret
+                garret
             '[filter_float_building_floors_num:from]': 1,  # minimal number of floors in the building
             '[filter_float_building_floors_num:to]': 1,  # maximal number of floors in the building
             'building_type': 'blok',  # enum: blok, w-kamienicy, dom-wolnostojacy, plomba, szeregowiec,
-            apartamentowiec, loft
+                apartamentowiec, loft
             '[filter_enum_heating][]': 'urban',  # enum: urban, gas, tiled_stove, electrical, boiler_room, other
             '[filter_float_build_year:from]': 1980,  # minimal year the building was built in
             '[filter_float_build_year:to]': 2016,  # maximal year the building was built in
             '[filter_enum_extras_types][]': ['balcony', 'basement'],  # enum: balcony, usable_room, garage, basement,
-             garden, terrace, lift, two_storey, separate_kitchen, air_conditioning, non_smokers_only
+                garden, terrace, lift, two_storey, separate_kitchen, air_conditioning, non_smokers_only
             '[filter_enum_media_types][]': ['internet', 'phone'],  # enum: internet, cable-television, phone
             '[free_from]': 'from_now',  # when will it be possible to move in, enum: from_now, 30, 90
             '[created_since]': 1,  # when was the offer posted on otodom in days, enum: 1, 3, 7, 14
@@ -146,7 +146,7 @@ def get_category(main_category, detail_category, region, **filters):
     """
     page, pages_count, parsed_content = 1, None, []
 
-    while page == 1 or page != pages_count:
+    while page == 1 or page <= pages_count:
         url = get_url(main_category, detail_category, region, "?nrAdsPerPage=72", page, **filters)
         content = get_response_for_url(url).content
         if not was_category_search_successful(content):
