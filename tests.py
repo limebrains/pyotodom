@@ -23,23 +23,6 @@ ACTUAL_REGIONS = [
     {"voivodeship": "pomorskie"}, {"[street_id]": 15544, "city": "sopot_208"}, {}
 ]
 
-@pytest.mark.parametrize(
-    'text,dic,expected_value', [
-        ('ala', {'a': 'b'}, 'blb'),
-        ('Gdańsk', {'ń': 'n'}, 'Gdansk')
-     ])
-def test_replace_all(text, dic, expected_value):
-    assert utils.replace_all(text, dic) == expected_value
-
-
-@pytest.mark.parametrize(
-    'text,expected_value', [
-        ('ala MA KoTa', 'ala-ma-kota'),
-        ('Gdańsk', 'gdansk')
-     ])
-def test_normalize_text(text, expected_value):
-    assert utils.normalize_text(text) == expected_value
-
 
 @pytest.mark.parametrize('filters,expected_value', zip(ACTUAL_REGIONS, ACTUAL_REGIONS))
 def test_get_region_from_filters(filters, expected_value):
@@ -373,7 +356,6 @@ def test_get_offer_information(url, context):
                 mock.patch("otodom.offer.get_cookie_from") as get_cookie_from, \
                 mock.patch("otodom.offer.get_csrf_token") as get_csrf_token, \
                 mock.patch("otodom.offer.get_offer_phone_numbers") as get_offer_phone_numbers, \
-                mock.patch("otodom.utils.replace_all") as replace_all, \
                 mock.patch("otodom.offer.get_offer_ninja_pv") as get_offer_ninja_pv, \
                 mock.patch("otodom.offer.get_offer_total_floors"), \
                 mock.patch("otodom.offer.get_offer_apartment_details"):
@@ -382,8 +364,7 @@ def test_get_offer_information(url, context):
             assert BeautifulSoup.called
             assert get_cookie_from.called
             assert get_csrf_token.called
-            assert get_offer_phone_numbers
-            assert replace_all
-            assert get_offer_ninja_pv
+            assert get_offer_phone_numbers.called
+            assert get_offer_ninja_pv.called
 
 

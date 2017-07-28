@@ -7,14 +7,14 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-from scrapper_helpers.utils import caching
+from scrapper_helpers.utils import caching, key_sha1, replace_all
 
-from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url, replace_all
+from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url
 
 log = logging.getLogger(__file__)
 
 
-@caching
+@caching(key_func=key_sha1)
 def get_offer_phone_numbers(offer_id, cookie, csrf_token):
     """
     This method makes a request to the OtoDom API asking for the poster's phone number(s) and returns it.

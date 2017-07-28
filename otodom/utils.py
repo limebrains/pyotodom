@@ -5,13 +5,13 @@ import json
 import logging
 import re
 import sys
-import unicodedata
 import requests
 try:
     from __builtin__ import unicode
 except ImportError:
     unicode = lambda x, *args: x
-from scrapper_helpers.utils import caching
+
+from scrapper_helpers.utils import caching, normalize_text, key_sha1
 
 from otodom import BASE_URL
 
@@ -23,43 +23,6 @@ else:
 REGION_DATA_KEYS = ["city", "voivodeship", "[district_id]", "[street_id]"]
 
 log = logging.getLogger(__file__)
-
-
-def replace_all(text, dic):
-    """
-    This method returns the input string, but replaces its characters according to the input dictionary.
-
-    :param text: input string
-    :param dic: dictionary containing the changes. key is the character that's supposed to be changed and value is
-                the desired value
-    :rtype: string
-    :return: String with the according characters replaced
-    """
-    for i, j in dic.items():
-        text = text.replace(i, j)
-    return text
-
-
-def normalize_text(text, lower=True, replace_spaces='-'):
-    """
-    This method returns the input string, but normalizes is it for use in the url.
-
-    :param text: input string
-    :rtype: string
-    :return: Normalized string. lowercase, no diacritics, '-' instead of ' '
-    """
-    try:
-        unicoded = unicode(text, 'utf8')
-    except TypeError:
-        unicoded = text
-    if lower:
-        unicoded = unicoded.lower()
-    normalized = unicodedata.normalize('NFKD', unicoded)
-    encoded_ascii = normalized.encode('ascii', 'ignore')
-    decoded_utf8 = encoded_ascii.decode("utf-8")
-    if replace_spaces:
-        decoded_utf8 = decoded_utf8.replace(" ", replace_spaces)
-    return decoded_utf8
 
 
 def get_region_from_autosuggest(region_part):
@@ -167,7 +130,7 @@ def get_url(main_category, detail_category, region, ads_per_page="", page=None, 
     return url
 
 
-@caching
+@caching(key_func=key_sha1)
 def get_response_for_url(url):
     """
     :param url: an url, most likely from the :meth:`scrape.utils.get_url` method

@@ -84,7 +84,7 @@ def get_category(main_category, detail_category, region, **filters):
 
     :param main_category: "wynajem" or "sprzedaz", should not be empty
     :param detail_category: "mieszkanie", "dom", "pokoj", "dzialka", "lokal", "haleimagazyny", "garaz", or
-    empty string for any
+                            empty string for any
     :param region: a string that contains the region name. Districts, cities and voivodeships are supported. The exact
                     location is established using OtoDom's API, just as it would happen when typing something into the
                     search bar. Empty string returns results for the whole country. Will be ignored if either 'city',
@@ -109,7 +109,7 @@ def get_category(main_category, detail_category, region, **filters):
             '[open_day]': 0,  # whether or not the poster organises an open day
             '[exclusive_offer]': 0,  # whether or not the offer is otodom exclusive
             '[filter_enum_rent_to_students][]': 0,  # whether or not the offer is aimed for students, only used for
-             apartments for rent
+                apartments for rent
             '[filter_enum_floor_no][]': 'floor_1',  # enum: cellar, ground_floor, floor_1-floor_10, floor_higher_10,
                 garret
             '[filter_float_building_floors_num:from]': 1,  # minimal number of floors in the building
