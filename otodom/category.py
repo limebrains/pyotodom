@@ -78,6 +78,29 @@ def was_category_search_successful(markup):
     return not has_warning
 
 
+def get_category_number_of_pages_from_parameters(main_category, detail_category, region, **filters):
+    """A method to establish the number of pages before actually scraping any data"""
+    url = get_url(main_category, detail_category, region, "?nrAdsPerPage=72", 1, **filters)
+    content = get_response_for_url(url).content
+    if not was_category_search_successful(content):
+        log.warning("Search for category wasn't successful", url)
+        return 0
+    html_parser = BeautifulSoup(content, "html.parser")
+    offers = html_parser.find(class_="current")
+    return int(offers.text) if offers else 1
+
+
+def get_distinct_category_page(page, main_category, detail_category, region, **filters):
+    """A method for scraping just the distinct page of a category"""
+    parsed_content = []
+    url = get_url(main_category, detail_category, region, "?nrAdsPerPage=72", page, **filters)
+    content = get_response_for_url(url).content
+
+    parsed_content.extend(parse_category_content(content))
+
+    return parsed_content
+
+
 def get_category(main_category, detail_category, region, **filters):
     """
     Scrape OtoDom search results based on supplied parameters.
