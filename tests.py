@@ -18,7 +18,7 @@ REGIONS_TO_TEST = [
     "Gdań", "Sop", "Oliw", "Wrzeszcz", "czechowice", "Nowa Wieś", "pomorskie", "Książąt pomor sopot", ""
 ]
 ACTUAL_REGIONS = [
-    {"city": "gdansk_40"}, {"city": "sopot_208"}, {"[district_id]": 51316, "city": "gdansk_40"},
+    {"city": "gdansk_40"}, {"city": "sopot_208"}, {"[districtf_id]": 51316, "city": "gdansk_40"},
     {"[district_id]": 30,"city": "gdansk_40"}, {"city": "czechowice-dziedzice_2258"}, {"city": "nowa-wies_6001"},
     {"voivodeship": "pomorskie"}, {"[street_id]": 15544, "city": "sopot_208"}, {}
 ]
@@ -192,7 +192,7 @@ def test_get_offer_details(markup_path, expected_value):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 1), reason="requires Python3")
-@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", ('54.4092043', '18.570687700000008'))])
+@pytest.mark.parametrize('markup_path,expected_value', [("test_data/offer", (54.4092043, 18.570687700000008))])
 def test_get_offer_geographical_coordinates(markup_path, expected_value):
     with open(markup_path, "rb") as markup_file:
         assert offer.get_offer_geographical_coordinates(
