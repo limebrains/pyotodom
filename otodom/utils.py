@@ -76,6 +76,10 @@ def get_region_from_filters(filters):
     return region_dict
 
 
+def get_number_from_string(s, number_type):
+    return number_type(s.replace(",", ".")) if s and s.replace(".", "").replace(",", "").isdigit() else None
+
+
 def get_url(main_category, detail_category, region, ads_per_page="", page=None, **filters):
     """
     This method builds a ready-to-use url based on the input parameters.

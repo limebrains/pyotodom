@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from scrapper_helpers.utils import caching, key_sha1, replace_all
 
-from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url
+from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url, get_number_from_string
 
 log = logging.getLogger(__file__)
 
@@ -211,8 +211,8 @@ def get_offer_geographical_coordinates(html_parser):
     :rtype: tuple(string)
     :return: A tuple containing the latitude and longitude of the apartment
     """
-    latitude = html_parser.find(itemprop="latitude").attrs["content"]
-    longitude = html_parser.find(itemprop="longitude").attrs["content"]
+    latitude = get_number_from_string(html_parser.find(itemprop="latitude").attrs["content"], float)
+    longitude = get_number_from_string(html_parser.find(itemprop="longitude").attrs["content"], float)
     return latitude, longitude
 
 
@@ -292,10 +292,10 @@ def get_offer_information(url, context=None):
     return {
         'title': get_offer_title(html_parser),
         'address': get_offer_address(html_parser),
-        'surface': ninja_pv["surface"],
-        'rooms': ninja_pv["rooms"],
-        'floor': get_offer_floor(html_parser),
-        'total_floors': get_offer_total_floors(html_parser),
+        'surface': get_number_from_string(ninja_pv["surface"], float),
+        'rooms': get_number_from_string(ninja_pv["rooms"], int),
+        'floor': get_number_from_string(get_offer_floor(html_parser), int),
+        'total_floors': get_number_from_string(get_offer_total_floors(html_parser), int),
         'poster_name': get_offer_poster_name(html_parser),
         'poster_type': ninja_pv["poster_type"],
         'price': ninja_pv["ad_price"],

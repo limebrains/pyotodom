@@ -4,7 +4,7 @@
 import os
 import logging
 
-from otodom.category import get_category
+from otodom.category import get_category, get_distinct_category_page
 from otodom.offer import get_offer_information
 
 log = logging.getLogger(__file__)
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     if os.getenv('PRICE_TO'):
         input_dict['[filter_float_price:to]'] = os.getenv('PRICE_TO')
 
-    parsed_category = get_category("wynajem", "mieszkanie", "sopot", **input_dict)
+    parsed_category = get_category("wynajem", "mieszkanie", "gda", **input_dict)
 
     log.info("Offers in that category - {0}".format(len(parsed_category)))
 
