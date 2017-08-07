@@ -76,8 +76,19 @@ def get_region_from_filters(filters):
     return region_dict
 
 
+def _float(number):
+    return get_number_from_string(number, float)
+
+
+def _int(number):
+    return get_number_from_string(number, int)
+
+
 def get_number_from_string(s, number_type):
-    return number_type(s.replace(",", ".")) if s and s.replace(".", "").replace(",", "").isdigit() else None
+    try:
+        return number_type(s.replace(",", "."))
+    except ValueError:
+        return s if s else None
 
 
 def get_url(main_category, detail_category, region, ads_per_page="", page=None, **filters):
