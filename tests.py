@@ -18,7 +18,7 @@ REGIONS_TO_TEST = [
     "Gdań", "Sop", "Oliw", "Wrzeszcz", "czechowice", "Nowa Wieś", "pomorskie", "Książąt pomor sopot", ""
 ]
 ACTUAL_REGIONS = [
-    {"city": "gdansk_40"}, {"city": "sopot_208"}, {"[districtf_id]": 51316, "city": "gdansk_40"},
+    {"city": "gdansk_40"}, {"city": "sopot_208"}, {"[district_id]": 51316, "city": "gdansk_40"},
     {"[district_id]": 30,"city": "gdansk_40"}, {"city": "czechowice-dziedzice_2258"}, {"city": "nowa-wies_6001"},
     {"voivodeship": "pomorskie"}, {"[street_id]": 15544, "city": "sopot_208"}, {}
 ]
