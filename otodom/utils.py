@@ -11,7 +11,7 @@ try:
 except ImportError:
     unicode = lambda x, *args: x
 
-from scrapper_helpers.utils import caching, normalize_text, key_sha1
+from scrapper_helpers.utils import caching, normalize_text, key_sha1, get_random_user_agent
 
 from otodom import BASE_URL
 
@@ -151,7 +151,7 @@ def get_response_for_url(url):
     :param url: an url, most likely from the :meth:`scrape.utils.get_url` method
     :return: a requests.response object
     """
-    return requests.get(url)
+    return requests.get(url, headers={'User-Agent': get_random_user_agent()})
 
 
 def get_cookie_from(response):

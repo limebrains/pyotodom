@@ -7,9 +7,9 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-from scrapper_helpers.utils import caching, key_sha1, replace_all
+from scrapper_helpers.utils import caching, key_sha1, replace_all, _int, _float, get_random_user_agent
 
-from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url, _int, _float
+from otodom.utils import get_cookie_from, get_csrf_token, get_response_for_url
 
 log = logging.getLogger(__file__)
 
@@ -31,6 +31,7 @@ def get_offer_phone_numbers(offer_id, cookie, csrf_token):
     headers = {
         'cookie': "{0}".format(cookie),
         'content-type': "application/x-www-form-urlencoded",
+        'User-Agent': get_random_user_agent()
     }
 
     response = requests.request("POST", url, data=payload, headers=headers)
@@ -252,6 +253,26 @@ def get_offer_address(html_parser):
     return address
 
 
+def build_offer_additonal_assets(additional_assets, apartment_details):
+    details = {k: v for d in apartment_details for k, v in d.items()}
+    return {
+        'heating': details.get('ogrzewanie'),
+        'balcony': 'balkon' in additional_assets,
+        'kitchen': 'oddzielna kuchnia' in additional_assets,
+        'terrace': 'taras' in additional_assets,
+        'internet': 'internet' in additional_assets,
+        'elevator': 'winda' in additional_assets,
+        'car_parking': 'garaż/miejsce parkingowe' in additional_assets,
+        'disabled_facilities': None,
+        'mezzanine': None,
+        'basement': 'winda' in additional_assets,
+        'duplex_apartment': 'dwupoziomowe' in additional_assets,
+        'garden': 'ogródek' in additional_assets,
+        'garage': 'garaż' in 'garaż/miejsce parkingowe' in additional_assets,
+        'cable_tv': 'telewizja kablowa' in details
+    }
+
+
 def get_offer_information(url, context=None):
     """
     Scrape detailed information about an OtoDom offer.
@@ -287,7 +308,7 @@ def get_offer_information(url, context=None):
         csrf_token = ""
         phone_numbers = ""
         context = {}
-
+    apartment_details = get_offer_apartment_details(html_parser)
     ninja_pv = get_offer_ninja_pv(content)
     return {
         'title': get_offer_title(html_parser),
@@ -310,8 +331,8 @@ def get_offer_information(url, context=None):
         'photo_links': get_offer_photos_links(html_parser),
         'video_link': get_offer_video_link(html_parser),
         '3D_walkaround_link': get_offer_3d_walkaround_link(html_parser),
-        'apartment_details': get_offer_apartment_details(html_parser),
-        'additional_assets': get_offer_additional_assets(html_parser),
+        'apartment_details': apartment_details,
+        'additional_assets': build_offer_additonal_assets(get_offer_additional_assets(html_parser), apartment_details),
         'facebook_description': get_offer_facebook_description(html_parser),
         'meta': {
             'cookie': cookie,
