@@ -146,7 +146,10 @@ def get_offer_description(html_parser):
     :rtype: string
     :return: The apartment description
     """
-    description = html_parser.find(itemprop="description").text.replace(u'\xa0', u' ').replace('\n', ' ')
+    element = html_parser.find(itemprop="description") or html_parser.find(class_="offer-description")
+    if not element:
+        return
+    description = element.text.replace(u'\xa0', u' ').replace('\n', ' ')
     return description
 
 
@@ -158,7 +161,10 @@ def get_offer_poster_name(html_parser):
     :rtype: string
     :return: The poster's name
     """
-    name = html_parser.find(class_="box-person-name").text
+    element = html_parser.find(class_="box-person-name") or html_parser.find(class_="seller-box__seller-name")
+    if not element:
+        return
+    name = element.text.strip()
     return name
 
 
@@ -212,8 +218,11 @@ def get_offer_geographical_coordinates(html_parser):
     :rtype: tuple(string)
     :return: A tuple containing the latitude and longitude of the apartment
     """
-    latitude = _float(html_parser.find(itemprop="latitude").attrs["content"])
-    longitude = _float(html_parser.find(itemprop="longitude").attrs["content"])
+    try:
+        latitude = _float(html_parser.find(itemprop="latitude").attrs["content"])
+        longitude = _float(html_parser.find(itemprop="longitude").attrs["content"])
+    except AttributeError:
+        latitude, longitude = None, None
     return latitude, longitude
 
 
@@ -225,8 +234,11 @@ def get_offer_details(html_parser):
     :rtype: list(dict)
     :return: A list of dictionaries containing information about the offer
     """
-    f = html_parser.find(class_="text-details").text
-    return [{d.split(': ')[0].strip(): d.split(': ')[1].strip()} for d in f.split("\n") if not re.match(r'^\s*$', d)]
+    try:
+        f = html_parser.find(class_="text-details").text
+        return [{d.split(': ')[0].strip(): d.split(': ')[1].strip()} for d in f.split("\n") if not re.match(r'^\s*$', d)]
+    except AttributeError:
+        return {}
 
 
 def get_offer_title(html_parser):
@@ -237,7 +249,7 @@ def get_offer_title(html_parser):
     :rtype: string
     :return: The offer title
     """
-    title = html_parser.find(class_="col-md-offer-content").h1.text
+    title = html_parser.find("title").text
     return title
 
 
@@ -249,12 +261,19 @@ def get_offer_address(html_parser):
     :rtype: string
     :return: The offer address
     """
-    address = html_parser.find(class_="address-text").text
-    return address
+    try:
+        address = html_parser.find(class_="address-text").text
+    except AttributeError:
+        return
+    else:
+        return address
 
 
 def build_offer_additonal_assets(additional_assets, apartment_details):
     details = {k: v for d in apartment_details for k, v in d.items()}
+    if not any(details.values()):
+        return {}
+
     return {
         'heating': details.get('ogrzewanie'),
         'balcony': 'balkon' in additional_assets,
@@ -270,6 +289,20 @@ def build_offer_additonal_assets(additional_assets, apartment_details):
         'garden': 'ogródek' in additional_assets,
         'garage': 'garaż' in 'garaż/miejsce parkingowe' in additional_assets,
         'cable_tv': 'telewizja kablowa' in details
+    }
+
+
+def get_flat_data(html_parser, ninja_pv):
+    apartment_details = get_offer_apartment_details(html_parser)
+
+    return {
+        '3D_walkaround_link': get_offer_3d_walkaround_link(html_parser),
+        'apartment_details': apartment_details,
+        'additional_assets': build_offer_additonal_assets(get_offer_additional_assets(html_parser), apartment_details),
+        'surface': _float(ninja_pv.get("surface", '')),
+        'rooms': _int(ninja_pv.get("rooms", '')),
+        'floor': _int(get_offer_floor(html_parser)),
+        'total_floors': _int(get_offer_total_floors(html_parser)),
     }
 
 
@@ -308,31 +341,24 @@ def get_offer_information(url, context=None):
         csrf_token = ""
         phone_numbers = ""
         context = {}
-    apartment_details = get_offer_apartment_details(html_parser)
+
     ninja_pv = get_offer_ninja_pv(content)
-    return {
+    result = {
         'title': get_offer_title(html_parser),
         'address': get_offer_address(html_parser),
-        'surface': _float(ninja_pv["surface"]),
-        'rooms': _int(ninja_pv["rooms"]),
-        'floor': _int(get_offer_floor(html_parser)),
-        'total_floors': _int(get_offer_total_floors(html_parser)),
         'poster_name': get_offer_poster_name(html_parser),
-        'poster_type': ninja_pv["poster_type"],
-        'price': ninja_pv["ad_price"],
-        'currency': ninja_pv["price_currency"],
-        'city': ninja_pv["city_name"],
+        'poster_type': ninja_pv.get("poster_type"),
+        'price': ninja_pv.get("ad_price"),
+        'currency': ninja_pv.get("price_currency"),
+        'city': ninja_pv.get("city_name"),
         'district': ninja_pv.get("district_name", ""),
-        'voivodeship': ninja_pv["region_name"],
+        'voivodeship': ninja_pv.get("region_name"),
         'geographical_coordinates': get_offer_geographical_coordinates(html_parser),
         'phone_numbers': phone_numbers,
         'description': get_offer_description(html_parser),
         'offer_details': get_offer_details(html_parser),
         'photo_links': get_offer_photos_links(html_parser),
         'video_link': get_offer_video_link(html_parser),
-        '3D_walkaround_link': get_offer_3d_walkaround_link(html_parser),
-        'apartment_details': apartment_details,
-        'additional_assets': build_offer_additonal_assets(get_offer_additional_assets(html_parser), apartment_details),
         'facebook_description': get_offer_facebook_description(html_parser),
         'meta': {
             'cookie': cookie,
@@ -340,3 +366,9 @@ def get_offer_information(url, context=None):
             'context': context
         }
     }
+
+    flat_data = get_flat_data(html_parser, ninja_pv)
+    if any(flat_data.values()):
+        result.update(flat_data)
+
+    return result
