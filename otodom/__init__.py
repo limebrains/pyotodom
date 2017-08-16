@@ -25,4 +25,6 @@ BASE_URL = 'http://www.otodom.pl'
 WHITELISTED_DOMAINS = [
     'otodom.pl',
     'www.otodom.pl',
+    'otomoto.pl',
+    'www.otomoto.pl'
 ]

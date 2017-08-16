@@ -28,14 +28,17 @@ def parse_category_offer(offer_markup):
     html_parser = BeautifulSoup(offer_markup, "html.parser")
     link = html_parser.find("a")
     url = link.attrs['href']
-    offer_id = html_parser.find('article').attrs['data-item-id']
+    offer_id = html_parser.find('article').attrs.get('data-item-id')
     if not url:
         # detail url is not present
         return {}
     if urlparse(url).hostname not in WHITELISTED_DOMAINS:
         # domain is not supported by this backend
         return {}
-    poster = html_parser.find(class_="offer-item-details-bottom").find(class_="pull-right")
+    try:
+        poster = html_parser.find(class_="offer-item-details-bottom").find(class_="pull-right")
+    except AttributeError:
+        poster = ''
     return {
         'detail_url': url,
         'offer_id': offer_id,
@@ -54,8 +57,8 @@ def parse_category_content(markup):
     offers = html_parser.find_all(class_="offer-item")
     parsed_offers = [
         parse_category_offer(str(offer)) for offer in offers
-        if offer.attrs["data-featured-name"] != "promo_vip" and
-        offer.attrs["data-featured-name"] != "promo_top_ads"
+        if offer.attrs.get("data-featured-name") != "promo_vip" and
+        offer.attrs.get("data-featured-name") != "promo_top_ads"
     ]
     return parsed_offers
 

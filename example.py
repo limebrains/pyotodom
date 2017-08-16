@@ -4,7 +4,7 @@
 import os
 import logging
 
-from otodom.category import get_category, get_distinct_category_page
+from otodom.category import get_category
 from otodom.offer import get_offer_information
 
 log = logging.getLogger(__file__)
