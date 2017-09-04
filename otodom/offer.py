@@ -405,7 +405,7 @@ def get_offer_information(url, context=None):
         # getting offer details
         try:
             phone_numbers = get_offer_phone_numbers(offer_id, cookie, csrf_token)
-        except KeyError as e:
+        except KeyError:
             # offer was not present any more
             phone_numbers = []
 
