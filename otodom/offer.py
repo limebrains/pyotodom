@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import datetime as dt
 import json
 import logging
 import re
@@ -102,6 +103,49 @@ def get_offer_total_floors(html_parser, default_value=''):
     return total_floors
 
 
+def get_month_num_for_string(value):
+    """
+    Map for polish month names
+
+    :param value: Month value
+    :type value: str
+    :return: Month number
+    :rtype: int
+    """
+    value = value.lower()[:3]
+    return {
+        'sty': 1,
+        'lut': 2,
+        'mar': 3,
+        'kwi': 4,
+        'maj': 5,
+        'cze': 6,
+        'lip': 7,
+        'sie': 8,
+        'wrz': 9,
+        'paź': 10,
+        'lis': 11,
+        'gru': 12,
+    }.get(value)
+
+
+def parse_available_from(date):
+    """
+    Parses string date to unix timestamp
+
+    :param date: Date
+    :type date: str
+    :return: Unix timestamp
+    :rtype: int
+    """
+    date_parts = date.split(' ')
+    month = get_month_num_for_string(date_parts[1].lower())
+    year = int(date_parts[2])
+    day = int(date_parts[0])
+    date_added = dt.datetime(year=year, day=day, month=month)
+    return int((date_added - dt.datetime(1970, 1, 1)).total_seconds())
+
+
 def get_offer_apartment_details(html_parser):
     """
     This method returns detailed information about the apartment.
@@ -114,7 +158,12 @@ def get_offer_apartment_details(html_parser):
     apartment_details = ''
     if found:
         apartment_details = found.text
-    details = [{d.split(": ")[0]: d.split(": ")[1]} for d in str(apartment_details).split("\n") if d]
+    details = [{d.split(": ")[0]: d.split(": ")[1]}
+               for d in str(apartment_details).split("\n") if d]
+    for i, detail in enumerate(details):
+        available_from = detail.get('Dostępne od')
+        if available_from:
+            details[i] = {list(detail.keys())[0]: parse_available_from(available_from)}
     return details
 
 
@@ -226,6 +275,25 @@ def get_offer_geographical_coordinates(html_parser):
     return latitude, longitude
 
 
+def parse_date_to_timestamp(date):
+    """
+    Parses string date to unix timestamp
+
+    :param date: Date
+    :type date: str
+    :return: Unix timestamp
+    :rtype: int
+    """
+    if 'ponad' in date:
+        date = (dt.datetime.now() - dt.timedelta(days=15)).date().strftime("%d.%m.%Y")
+    date_parts = date.split('.')
+    month = int(date_parts[1])
+    year = int(date_parts[2])
+    day = int(date_parts[0])
+    date_added = dt.datetime(year=year, day=day, month=month)
+    return int((date_added - dt.datetime(1970, 1, 1)).total_seconds())
+
+
 def get_offer_details(html_parser):
     """
     This method returns detailed information about the offer.
@@ -234,11 +302,14 @@ def get_offer_details(html_parser):
     :rtype: list(dict)
     :return: A list of dictionaries containing information about the offer
     """
+    # [{d.split(': ')[0].strip(): d.split(': ')[1].strip()} for d in f.split("\n") if not re.match(r'^\s*$', d)]
     try:
         f = html_parser.find(class_="text-details").text
-        return (
-            [{d.split(': ')[0].strip(): d.split(': ')[1].strip()} for d in f.split("\n") if not re.match(r'^\s*$', d)]
-        )
+        temp = [d for d in f.split("\n") if not re.match(r'^\s*$', d)]
+        output = [{d.split(': ')[0].strip(): d.split(': ')[1].strip()} for d in temp if "Data" not in d]
+        output.extend([{d.split(': ')[0].strip(): parse_date_to_timestamp(d.split(': ')[1].strip())} for d in temp
+                       if "Data" in d])
+        return output
     except AttributeError:
         return {}
 
@@ -317,7 +388,6 @@ def get_offer_information(url, context=None):
 
     :returns: A dictionary containing the scraped offer details
     """
-
     # getting response
     response = get_response_for_url(url)
     content = response.content
@@ -375,5 +445,4 @@ def get_offer_information(url, context=None):
     flat_data = get_flat_data(html_parser, ninja_pv)
     if any(flat_data.values()):
         result.update(flat_data)
-
     return result

@@ -182,8 +182,8 @@ def test_get_offer_address(markup_path, expected_value):
     ("test_data/offer", [
         {'Nr oferty w Otodom': '48721860'},
         {'Liczba wyświetleń strony': '1143'},
-        {'Data dodania': 'ponad 14 dni temu'},
-        {'Data aktualizacji': 'ponad 14 dni temu'}
+        {'Data dodania': 1503187200},
+        {'Data aktualizacji': 1503187200}
     ])
 ])
 def test_get_offer_details(markup_path, expected_value):
