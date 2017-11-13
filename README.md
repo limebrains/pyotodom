@@ -11,6 +11,10 @@ Python scrapper for otodom
 ### Installation
 
 ```
+pip install pyotodom
+```
+
+```
 pip install -r requirements.txt
 ```
 
